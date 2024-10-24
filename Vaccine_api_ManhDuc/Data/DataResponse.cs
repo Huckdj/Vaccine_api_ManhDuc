@@ -3,8 +3,8 @@
     public class DataResponse
     {
         public string Message { get; set; }
-        public object Data { get; set; }  // Change this to object
         public string Status { get; set; }
+        public dynamic Data { get; set; }
 
         public DataResponse(string message = "", object data = null, string status = "0") // Change to object
         {
@@ -13,4 +13,5 @@
             Status = status;
         }
     }
+
 }

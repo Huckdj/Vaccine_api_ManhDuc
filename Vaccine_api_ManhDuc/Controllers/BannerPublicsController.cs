@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Data.SqlClient; // Sử dụng Microsoft.Data.SqlClient
 using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
 using Vaccine_api_ManhDuc.Data;
 
@@ -12,17 +10,18 @@ namespace Vaccine_api_ManhDuc.Controllers
     [ApiController]
     public class BannerPublicsController : ControllerBase
     {
-        private readonly string _connectionString;
+        private readonly DataRepository _dataRepository;
         private readonly string _procedureName = "ExecBanner";
 
         public BannerPublicsController(IConfiguration configuration)
         {
-            // Lấy chuỗi kết nối từ appsettings.json
-            _connectionString = configuration.GetConnectionString("VaccineDB");
+            var connectionString = configuration.GetConnectionString("VaccineDB");
+            _dataRepository = new DataRepository(connectionString);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> GetBannerData() // Mặc định là 'GET'
+        // Định tuyến riêng cho phương thức GetBannerData
+        [HttpPost("GetBannerData")]
+        public async Task<IActionResult> GetBannerData()
         {
             try
             {
@@ -31,10 +30,9 @@ namespace Vaccine_api_ManhDuc.Controllers
                     { "Type", "GET" }
                 };
 
-                // Get the data response from the database
-                var resultList = await GetDataResponse(parameters);
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
 
-                // Create the DataResponse object
+                // Tạo đối tượng DataResponse
                 DataResponse dataResponse = new DataResponse("Success", resultList, "0");
 
                 // Trả về kết quả
@@ -47,50 +45,34 @@ namespace Vaccine_api_ManhDuc.Controllers
             }
         }
 
-        private async Task<List<Dictionary<string, object>>> GetDataResponse(Dictionary<string, object> parameters)
+        // Định tuyến riêng cho phương thức AddBanner
+        [HttpPost("AddBanner")]
+        public async Task<IActionResult> AddBanner([FromBody] BannerPublics.AddBanner banner)
         {
-            // Danh sách chứa kết quả trả về từ SQL Server
-            var resultList = new List<Dictionary<string, object>>();
-
-            // Tạo kết nối SQL
-            using (var connection = new SqlConnection(_connectionString))
+            try
             {
-                // Tạo command để thực thi stored procedure
-                using (var command = new SqlCommand(_procedureName, connection))
+                Dictionary<string, object> parameters = new()
                 {
-                    command.CommandType = CommandType.StoredProcedure;
+                    { "Type", "ADD-BANNER" },
+                    { "Name", banner.Name },
+                    { "Description", banner.Description },
+                    { "LinkImages", banner.LinkImages },
+                    { "PosText", banner.PosText }
+                };
 
-                    // Thêm tham số vào stored procedure
-                    foreach (var parameter in parameters)
-                    {
-                        command.Parameters.AddWithValue(parameter.Key, parameter.Value);
-                    }
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
 
-                    // Mở kết nối
-                    await connection.OpenAsync();
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
 
-                    // Thực thi stored procedure và lấy dữ liệu
-                    using (var reader = await command.ExecuteReaderAsync())
-                    {
-                        // Duyệt qua các hàng dữ liệu trả về
-                        while (await reader.ReadAsync())
-                        {
-                            var row = new Dictionary<string, object>();
-
-                            // Lấy dữ liệu từ mỗi cột trong hàng
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-                                row[reader.GetName(i)] = reader.GetValue(i);
-                            }
-
-                            // Thêm hàng vào danh sách kết quả
-                            resultList.Add(row);
-                        }
-                    }
-                }
+                // Trả về kết quả
+                return Ok(dataResponse);
             }
-
-            return resultList;
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
     }
 }
