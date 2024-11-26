@@ -6,7 +6,7 @@ using Vaccine_api_ManhDuc.Data;
 
 namespace Vaccine_api_ManhDuc.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class BannerPublicsController : ControllerBase
     {
@@ -20,7 +20,7 @@ namespace Vaccine_api_ManhDuc.Controllers
         }
 
         // Định tuyến riêng cho phương thức GetBannerData
-        [HttpPost("GetBannerData")]
+        [HttpPost]
         public async Task<IActionResult> GetBannerData()
         {
             try
@@ -46,7 +46,7 @@ namespace Vaccine_api_ManhDuc.Controllers
         }
 
         // Định tuyến riêng cho phương thức AddBanner
-        [HttpPost("AddBanner")]
+        [HttpPost]
         public async Task<IActionResult> AddBanner([FromBody] BannerPublics.AddBanner banner)
         {
             try
@@ -57,6 +57,88 @@ namespace Vaccine_api_ManhDuc.Controllers
                     { "Name", banner.Name },
                     { "Description", banner.Description },
                     { "LinkImages", banner.LinkImages },
+                    { "PosText", banner.PosText }
+                };
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                // Trả về kết quả
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteBanner([FromBody] BannerPublics.DeleteBanner banner)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "DELETE" },
+                    { "ID", banner.ID },
+                };
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                // Trả về kết quả
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpDateByID([FromBody] BannerPublics.UpDateBanner banner)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "UPDATE-BY-ID" },
+                    { "ID", banner.ID },
+                    { "Name", banner.Name },
+                    { "PosText", banner.PosText },
+                    { "Description", banner.Description },
+                    { "LinkImages", banner.LinkImages }
+                };
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                // Trả về kết quả
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetByPosText([FromBody] BannerPublics.GetByPosText banner)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "GET-BYPOSTEXT" },
                     { "PosText", banner.PosText }
                 };
 
