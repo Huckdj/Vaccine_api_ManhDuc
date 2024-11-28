@@ -58,6 +58,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]))
@@ -68,7 +69,10 @@ var app = builder.Build();
 
 // Cấu hình middleware
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None); // Đóng các thư mục API mặc định
+});
 
 app.UseHttpsRedirection();
 
