@@ -50,5 +50,9 @@
         {
             public string LinkRoute { get; set; }
         }
+        public class SearchKeywords
+        {
+            public string SearchKeyword { get; set; }
+        }
     }
 }

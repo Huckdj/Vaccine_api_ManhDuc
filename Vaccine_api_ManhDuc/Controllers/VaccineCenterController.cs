@@ -4,48 +4,25 @@ using Vaccine_api_ManhDuc.Data;
 namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
 {
     [Route("api/[controller]/[action]")]
-    public class CountryItemController : Controller
+    public class VaccineCenterController : Controller
     {
         private readonly DataRepository _dataRepository;
-        private readonly string _procedureName = "ExecCountryItem";
+        private readonly string _procedureName = "ExecVaccineCenter";
 
-        public CountryItemController(IConfiguration configuration)
+        public VaccineCenterController(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("VaccineDB");
             _dataRepository = new DataRepository(connectionString);
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetData()
+        public async Task<IActionResult> GetAllDataCenter()
         {
             try
             {
                 Dictionary<string, object> parameters = new()
                 {
-                    { "Type", "GET-COUNTRY" }
-                };
-
-                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
-
-                // Tạo đối tượng DataResponse
-                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
-
-                return Ok(dataResponse);
-            }
-            catch (Exception ex)
-            {
-                // Trả về lỗi
-                return StatusCode(500, new { message = ex.Message });
-            }
-        }
-        [HttpPost]
-        public async Task<IActionResult> GetdataPublic()
-        {
-            try
-            {
-                Dictionary<string, object> parameters = new()
-                {
-                    { "Type", "GET-COUNTRY-PUBLIC" },
+                    { "Type", "GET-ALL" }
                 };
 
                 var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
@@ -63,15 +40,44 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertCountry([FromBody] CountryItem.InsertCountry request)
+        public async Task<IActionResult> GetDataPublic()
         {
             try
             {
                 Dictionary<string, object> parameters = new()
                 {
-                    { "Type", "INSERT-COUNTRY" },
-                    { "NameCountry", request.NameCountry }
+                    { "Type", "GET-PUBLIC" }
                 };
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> InsertCenter([FromBody] VaccineCenter.insertcenter request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "INSERT-CENTER" },
+                    { "Name", request.Name },
+                    { "Address", request.Address },
+                    { "Ward", request.Ward },
+                    { "District", request.District },
+                    { "City", request.City },
+                    { "LinkGoogle", request.LinkGoogle }
+                };
+
 
                 var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
 
@@ -88,42 +94,22 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeletCountry([FromBody] CountryItem.UpdateCountry request)
+        public async Task<IActionResult> EditCenterItem([FromBody] VaccineCenter.EditCenter request)
         {
             try
             {
                 Dictionary<string, object> parameters = new()
                 {
-                    { "Type", "DELETE-COUNTRY" },
-                    { "ID", request.ID }
+                    { "Type", "EDIT-CENTER" },
+                    { "ID",request.ID},
+                    { "Name", request.Name },
+                    { "Address", request.Address },
+                    { "Ward", request.Ward },
+                    { "District", request.District },
+                    { "City", request.City },
+                    { "LinkGoogle",request.LinkGoogle}
                 };
 
-                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
-
-                // Tạo đối tượng DataResponse
-                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
-
-                return Ok(dataResponse);
-            }
-            catch (Exception ex)
-            {
-                // Trả về lỗi
-                return StatusCode(500, new { message = ex.Message });
-            }
-        }
-
-
-        [HttpPost]
-        public async Task<IActionResult> EditById([FromBody] CountryItem.EditByID request)
-        {
-            try
-            {
-                Dictionary<string, object> parameters = new()
-                {
-                    { "Type", "EDITCOUNTRY-BYID" },
-                    { "NameCountry", request.NameCountry},
-                    { "ID", request.ID }
-                };
 
                 var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
 
@@ -140,16 +126,69 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
         }
 
         [HttpPost]
-        public async Task<IActionResult> SetActive([FromBody] CountryItem.SetActive request)
+        public async Task<IActionResult> DeleteCenterItem([FromBody] VaccineCenter.DeleteCenterr request)
         {
             try
             {
                 Dictionary<string, object> parameters = new()
                 {
-                    { "Type", "ACTIVE-COUNTRY" },
-                    { "IsActive", request.IsActive},
-                    { "ID", request.ID }
+                    { "Type", "DELETE-CENTER-ITEM" },
+                    { "ID",request.ID}
                 };
+
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ActiveCenterItem([FromBody] PackItem.ActivePackItem request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "ACTIVE-CENTER-ITEM" },
+                    { "ID",request.ID},
+                    { "IsActive", request.IsActive }
+                };
+
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetCenterByID([FromBody] PackItem.centerID request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "GET-BYID" },
+                    { "ID",request.ID} 
+                };
+
 
                 var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
 

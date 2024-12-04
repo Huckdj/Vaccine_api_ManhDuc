@@ -139,6 +139,67 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUser
         }
 
         [HttpPost]
+        public async Task<IActionResult> GetByID([FromBody] AuthUs.Getid request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "Get-by-ID" },
+                    { "ID", request.ID}
+                };
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+                // Trả về kết quả
+                var user = resultList[0];
+                if (user.ContainsKey("ErrorCode") && Convert.ToInt32(user["ErrorCode"]) == 0)
+                {
+                    string token = GenerateJwtToken(user);
+                    user["token"] = token;
+                }
+
+
+                return Ok(new { user });
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RechargePassword([FromBody] AuthUs.RechangerPassword request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "Recharge-Password" },
+                    { "ID", request.ID},
+                    { "Password",request.Password},
+                    { "NewPassword",request.NewPassword}
+                };
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
         public IActionResult Logout([FromBody] string token)
         {
             // Gọi API để làm token hết hạn

@@ -2,6 +2,8 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Vaccine_api_ManhDuc.Controllers;
+using Vaccine_api_ManhDuc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,7 +49,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod()));
 
-// Authentication
+builder.Services.AddHostedService<ScheduledTaskService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -66,12 +68,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var app = builder.Build();
-
 // Cấu hình middleware
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None); // Đóng các thư mục API mặc định
+    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
 });
 
 app.UseHttpsRedirection();

@@ -243,6 +243,50 @@ namespace Vaccine_api_ManhDuc.Controllers
                 return StatusCode(500, new { message = ex.Message });
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> RandomAllPost()
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "RANDOM_POST_ALL" }
+                };
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SearchPost([FromBody] PostPublics.SearchKeywords request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "SEARCH" },
+                    { "SearchKeyword", request.SearchKeyword }
+                };
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
 
     }
 }
