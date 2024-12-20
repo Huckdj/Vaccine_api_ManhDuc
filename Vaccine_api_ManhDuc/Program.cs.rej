@@ -1,0 +1,15 @@
+diff a/Vaccine_api_ManhDuc/Program.cs b/Vaccine_api_ManhDuc/Program.cs	(rejected hunks)
+@@ -68,12 +68,11 @@
+     });
+ 
+ var app = builder.Build();
+-
+ // Cấu hình middleware
+ app.UseSwagger();
+ app.UseSwaggerUI(c =>
+ {
+-    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None); // Đóng các thư mục API mặc định
++    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+ });
+ 
+ app.UseHttpsRedirection();

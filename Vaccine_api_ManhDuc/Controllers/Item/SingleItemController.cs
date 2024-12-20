@@ -77,7 +77,8 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
                     { "ShortContent", request.ShortContent },
                     { "FullContent", request.FullContent },
                     { "LinkImages", request.LinkImages },
-                    { "LinkRoute", request.LinkRoute }
+                    { "LinkRoute", request.LinkRoute },
+                    { "AgeType",request.AgeType }
                 };
 
 
@@ -110,7 +111,8 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
                     { "ShortContent", request.ShortContent },
                     { "FullContent", request.FullContent },
                     { "LinkImages", request.LinkImages },
-                    { "LinkRoute", request.LinkRoute }
+                    { "LinkRoute", request.LinkRoute },
+                    { "AgeType",request.AgeType }
                 };
 
 
@@ -164,6 +166,32 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
                     { "Type", "ACTIVE-SINGLE-ITEM" },
                     { "ID",request.ID},
                     { "IsActive", request.IsActive }
+                };
+
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetsingleByRoute([FromBody] SingleItem.getroute request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "GET-BY-LINKROUTE" },
+                    { "LinkRoute", request.LinkRoute }
                 };
 
 

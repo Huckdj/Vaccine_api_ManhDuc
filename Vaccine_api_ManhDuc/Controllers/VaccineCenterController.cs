@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using System.Dynamic;
 using Vaccine_api_ManhDuc.Data;
 
 namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
@@ -203,6 +205,9 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
                 return StatusCode(500, new { message = ex.Message });
             }
         }
+
+
+        
 
     }
 }

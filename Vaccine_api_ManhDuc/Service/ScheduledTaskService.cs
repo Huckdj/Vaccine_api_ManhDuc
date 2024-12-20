@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using Vaccine_api_ManhDuc.Controllers.AuthUserAdmin;
 using Vaccine_api_ManhDuc.Data;
 using Microsoft.Extensions.Configuration;
+using NodaTime;
+using NodaTime.TimeZones;
 
 namespace Vaccine_api_ManhDuc.Services
 {
@@ -23,20 +25,21 @@ namespace Vaccine_api_ManhDuc.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            // Đặt lịch để thực hiện công việc mỗi ngày lúc 7h sáng (theo giờ Việt Nam)
-            var now = DateTime.Now;
-            var firstRun = DateTime.Today.AddHours(7);
+            var vietnamTimeZone = DateTimeZoneProviders.Tzdb["Asia/Ho_Chi_Minh"];
+            var clock = SystemClock.Instance;
+            var now = clock.GetCurrentInstant().InZone(vietnamTimeZone).ToDateTimeUnspecified();
+
+            var firstRun = now.Date.AddHours(7);
 
             if (now > firstRun)
             {
-                firstRun = firstRun.AddDays(1);  // Nếu đã qua 7h sáng hôm nay, thực hiện vào 7h sáng ngày mai
+                firstRun = firstRun.AddDays(1);
             }
 
             var initialDelay = firstRun - now;
-            var interval = TimeSpan.FromDays(1); // Mỗi ngày thực hiện lại
+            var interval = TimeSpan.FromDays(1);
 
             _timer = new Timer(ExecuteTask, null, initialDelay, interval);
-
             return Task.CompletedTask;
         }
 

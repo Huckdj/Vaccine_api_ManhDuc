@@ -11,6 +11,7 @@
             public string FullContent { get; set; } 
             public string LinkImages { get; set; }  
             public string LinkRoute { get; set; }  
+            public string AgeType { get; set; }
         }
         public class EditSingleItem
         {
@@ -22,11 +23,16 @@
             public string FullContent { get; set; }
             public string LinkImages { get; set; }
             public string LinkRoute { get; set; }
+            public string AgeType { get; set; }
         }
 
         public class DeleteSingleItem
         {
             public int ID { get; set; }
+        }
+        public class getroute
+        {
+            public string LinkRoute { get; set; }
         }
 
         public class ActiveSingleItem

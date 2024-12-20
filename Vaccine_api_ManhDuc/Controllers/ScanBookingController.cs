@@ -82,7 +82,6 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
                         </div>
 ";
 
-                        // Gửi email thông báo
                         await emailService.SendEmailAsync(email, "Nhắc lịch tiêm chủng", body);
                     }
                 }

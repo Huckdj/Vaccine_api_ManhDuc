@@ -23,5 +23,15 @@
             public string Password { get; set; }
             public string NewPassword { get; set; }
         }
+        public class GoogleLoginRequest
+        {
+            public string Email { get; set; }
+            public string GoogleId { get; set; }
+        }
+        public class forgotpassword
+        {
+            public string Email { get; set; }
+            public string SDT { get; set; }
+        }
     }
 }

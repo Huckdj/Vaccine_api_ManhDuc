@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Vaccine_api_ManhDuc.Data;
-
 namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
 {
     [Route("api/[controller]/[action]")]
@@ -164,6 +163,32 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUserAdmin
                     { "Type", "ACTIVE-PACK-ITEM" },
                     { "ID",request.ID},
                     { "IsActive", request.IsActive }
+                };
+
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Tạo đối tượng DataResponse
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetsingleByRoute([FromBody] SingleItem.getroute request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+                {
+                    { "Type", "GET-BY-LINKROUTE" },
+                    { "LinkRoute", request.LinkRoute }
                 };
 
 

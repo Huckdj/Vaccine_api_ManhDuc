@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Vaccine_api_ManhDuc.Data;
+using static Vaccine_api_ManhDuc.Data.AuthUs;
 
 namespace Vaccine_api_ManhDuc.Controllers.AuthUser
 {
@@ -207,7 +208,245 @@ namespace Vaccine_api_ManhDuc.Controllers.AuthUser
 
             return Ok(new { ErrorCode = 200, Message = "Đăng xuất thành công." });
         }
+        [HttpPost]
+        public async Task<IActionResult> GoogleLogin([FromBody] AuthUs.GoogleLoginRequest request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+        {
+            { "Type", "Google-Login" },
+            { "Email", request.Email },
+            { "GoogleId", request.GoogleId }
+        };
 
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                // Create DataResponse object
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+
+                var user = resultList[0];
+                if (user.ContainsKey("ErrorCode") && Convert.ToInt32(user["ErrorCode"]) == 0)
+                {
+                    string token = GenerateJwtToken(user);
+                    user["token"] = token;
+                }
+
+                return Ok(new { user });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> ForgetPassword([FromBody] AuthUs.forgotpassword request)
+        {
+            try
+            {
+                Dictionary<string, object> parameters = new()
+        {
+            { "Type", "Forget-Password" },
+            { "Email", request.Email},
+            { "SDT",request.SDT }
+        };
+
+                var resultList = await _dataRepository.GetDataResponse(_procedureName, parameters);
+
+                DataResponse dataResponse = new DataResponse("Success", resultList, "0");
+                var user = resultList[0];
+                if (user.ContainsKey("ErrorCode") && Convert.ToInt32(user["ErrorCode"]) == 0)
+                {
+                    string email = user.ContainsKey("Email") ? user["Email"].ToString() : "null";
+                    string password = user.ContainsKey("Password") ? user["Password"].ToString() : "null";
+                    var emailService = new EmailService(_configuration);
+
+                    var body = $@"<!DOCTYPE html>
+                        <html lang=""vi"">
+                        <head>
+                            <meta charset=""UTF-8"">
+                            <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                            <title>MADU Vaccinations - Đặt Mật Khẩu Mới</title>
+                            <style>
+                                body {{
+                                    font-family: Arial, sans-serif;
+                                    display: grid;
+                                    place-content: center;
+                                    min-height: 100vh;
+                                    background-color: #f0f2f5;
+                                    margin: 0;
+                                    padding: 20px;
+                                    box-sizing: border-box;
+                                }}
+                                .container {{
+                                    background-color: white;
+                                    border-radius: 10px;
+                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    padding: 30px;
+                                    width: 100%;
+                                    max-width: 400px;
+                                    text-align: center;
+                                }}
+                                h1 {{
+                                    color: #2c3e50;
+                                    margin-bottom: 20px;
+                                }}
+                                .form-group {{
+                                    margin-bottom: 15px;
+                                    text-align: left;
+                                }}
+                                label {{
+                                    display: block;
+                                    margin-bottom: 5px;
+                                    color: #34495e;
+                                }}
+                                input {{
+                                    width: 100%;
+                                    padding: 10px;
+                                    border: 1px solid #bdc3c7;
+                                    border-radius: 5px;
+                                    box-sizing: border-box;
+                                }}
+                                .submit-btn {{
+                                    width: 100%;
+                                    padding: 12px;
+                                    background-color: #3498db;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    transition: background-color 0.3s ease;
+                                    margin-top: 15px;
+                                }}
+                                .submit-btn:hover {{
+                                    background-color: #2980b9;
+                                }}
+                                .logo {{
+                                    max-width: 150px;
+                                    margin-bottom: 20px;
+                                }}
+                                .password-note {{
+                                    font-size: 0.9em;
+                                    color: #7f8c8d;
+                                    margin-top: 10px;
+                                    text-align: left;
+                                }}
+                                .contact-links {{
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    gap: 10px;
+                                }}
+                                .contact-links a {{
+                                    text-decoration: none;
+                                    color: #2c3e50;
+                                    font-weight: bold;
+                                }}
+                                .contact-links a:hover {{
+                                    color: #3498db;
+                                }}
+                            </style>
+                        </head>
+                        <body>
+                            <div class=""container"">
+                                <img src=""https://res.cloudinary.com/dumx42hqq/image/upload/v1731056834/PostImages/icsym0mh9awpaghpnvd0.png"" 
+                                     alt=""MADU Vaccinations Logo"" 
+                                     class=""logo"">
+        
+                                <h1>Mật Khẩu Mới</h1>
+        
+                                <form id=""newPasswordForm"">
+                                    <div class=""form-group"">
+                                        <label for=""newPassword"">Mật Khẩu Mới</label>
+                                        <input 
+                                            type=""text"" 
+                                            id=""newPassword"" 
+                                            name=""newPassword"" 
+                                            value=""{password}"" 
+                                            readonly
+                                        >
+                                        <p class=""password-note"">
+                                            Đây là mật khẩu mới của bạn. Vui lòng ghi lại và thay đổi sau khi đăng nhập.
+                                        </p>
+                                    </div>
+            
+                                    <button type=""button"" class=""submit-btn"" onclick=""copyPassword()"">
+                                        Sao Chép Mật Khẩu
+                                    </button>
+                                </form>
+                            </div>
+                            <footer>
+                                <div>
+                                    <p style=""font-weight: bold;"">Liên hệ với chúng tôi</p>
+                                    <div class=""contact-links"">
+                                        <a href=""tel:0331234567"">033.123.4567</a>
+                                        <span>|</span>
+                                        <a href=""https://www.facebook.com/madu.vaccinations/?_rdc=1&_rdr#"">FACEBOOK</a>
+                                        <span>|</span>
+                                        <a href=""https://maduvaccinations.vercel.app/"">WEBSITE</a>
+                                    </div>
+                                </div>
+                            </footer>
+                            <script>
+                                function copyPassword() {{
+                                    const passwordInput = document.getElementById('newPassword');
+            
+                                    // Chọn nội dung trong input
+                                    passwordInput.select();
+                                    passwordInput.setSelectionRange(0, 99999); // Hỗ trợ mobile
+
+                                    // Sao chép vào clipboard
+                                    navigator.clipboard.writeText(passwordInput.value).then(() => {{
+                                        alert('Đã sao chép mật khẩu mới. Vui lòng lưu giữ cẩn thận!');
+                                    }}).catch(err => {{
+                                        alert('Không thể sao chép. Hãy thử chọn và copy thủ công.');
+                                    }});
+                                }}
+                            </script>
+                        </body>
+                        </html>";
+                    await emailService.SendEmailAsync(email, "Bạn đã yêu cầu cấp lại mật khẩu", body);
+
+                    var errorCode = resultList[0]["ErrorCode"].ToString();
+                    var errorMessage = resultList[0]["ErrorMessage"].ToString();
+                    var result = resultList
+                        .Where(user => user.ContainsKey("Email") && user.ContainsKey("ErrorCode") && user.ContainsKey("ErrorMessage"))
+                        .Select(user => new
+                        {
+                            Email = user["Email"].ToString(),
+                            ErrorCode = user["ErrorCode"].ToString(),
+                            ErrorMessage = user["ErrorMessage"].ToString()
+                        }).ToList();
+
+
+                    return Ok(new
+                    {
+                        message = "Success",
+                        status = "0",
+                        data = result
+                    });
+                }
+                else
+                {
+                    return Ok(dataResponse);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+
+        private string CapitalizeFirstLetter(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return str;
+
+            return char.ToUpper(str[0]) + str.Substring(1);
+        }
         public class TokenExpiryMiddleware
         {
             private readonly RequestDelegate _next;
