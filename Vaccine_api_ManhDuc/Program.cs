@@ -2,13 +2,16 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Vaccine_api_ManhDuc.Services;
+using Vaccine_api_ManhDuc.Controllers;
+using Vaccine_api_ManhDuc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Services.AddHostedService<ScheduledTaskService>();
 // Cấu hình Swagger để hỗ trợ nhập JWT Token
 builder.Services.AddSwaggerGen(c =>
 {
@@ -64,6 +67,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]))
         };
     });
+builder.Services.AddHostedService<ScheduledTaskService>();
 
 var app = builder.Build();
 

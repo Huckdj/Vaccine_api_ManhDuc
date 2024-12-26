@@ -39,7 +39,12 @@ namespace Vaccine_api_ManhDuc.Services
             var initialDelay = firstRun - now;
             var interval = TimeSpan.FromDays(1);
 
+            _logger.LogInformation($"Current time (Vietnam): {now}");
+            _logger.LogInformation($"Task scheduled to run first at: {firstRun}");
+            _logger.LogInformation($"Initial delay: {initialDelay.TotalHours:F2} hours");
+
             _timer = new Timer(ExecuteTask, null, initialDelay, interval);
+
             return Task.CompletedTask;
         }
 
