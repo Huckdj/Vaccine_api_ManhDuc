@@ -1,0 +1,2231 @@
+USE [master]
+GO
+/****** Object:  Database [VaccineCategory]    Script Date: 5/12/2026 5:03:15 PM ******/
+CREATE DATABASE [VaccineCategory]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'VaccineCategory', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\VaccineCategory.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'VaccineCategory_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\VaccineCategory_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
+GO
+ALTER DATABASE [VaccineCategory] SET COMPATIBILITY_LEVEL = 160
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [VaccineCategory].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [VaccineCategory] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [VaccineCategory] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [VaccineCategory] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET  ENABLE_BROKER 
+GO
+ALTER DATABASE [VaccineCategory] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [VaccineCategory] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET RECOVERY FULL 
+GO
+ALTER DATABASE [VaccineCategory] SET  MULTI_USER 
+GO
+ALTER DATABASE [VaccineCategory] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [VaccineCategory] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [VaccineCategory] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [VaccineCategory] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [VaccineCategory] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [VaccineCategory] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+EXEC sys.sp_db_vardecimal_storage_format N'VaccineCategory', N'ON'
+GO
+ALTER DATABASE [VaccineCategory] SET QUERY_STORE = ON
+GO
+ALTER DATABASE [VaccineCategory] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
+GO
+USE [VaccineCategory]
+GO
+/****** Object:  UserDefinedFunction [dbo].[GetErrorMessage]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE FUNCTION [dbo].[GetErrorMessage] (@ErrorCode INT)
+RETURNS NVARCHAR(255)
+AS
+BEGIN
+    DECLARE @ErrorMessage NVARCHAR(255);
+
+    -- Truy vấn để lấy thông điệp lỗi từ bảng ErrorCodes
+    SELECT @ErrorMessage = ErrorMessage
+    FROM ErrorCodes
+    WHERE ErrorCode = @ErrorCode;
+
+    -- Nếu không tìm thấy mã lỗi, trả về một thông báo mặc định
+    IF @ErrorMessage IS NULL
+    BEGIN
+        SET @ErrorMessage = 'Unknown error code';
+    END
+
+    RETURN @ErrorMessage;
+END
+GO
+/****** Object:  Table [dbo].[Account]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Account](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Email] [nvarchar](255) NOT NULL,
+	[Password] [nvarchar](255) NULL,
+	[SDT] [nvarchar](15) NULL,
+	[isActive] [bit] NULL,
+	[isDeleted] [bit] NULL,
+	[Admin] [bit] NULL,
+	[CreateDate] [datetime] NOT NULL,
+	[GoogleId] [nvarchar](1000) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Banner]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Banner](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NOT NULL,
+	[LinkImages] [nvarchar](max) NOT NULL,
+	[Description] [nvarchar](1000) NULL,
+	[IsDeleted] [bit] NOT NULL,
+	[IsActive] [bit] NOT NULL,
+	[CreateDate] [datetime] NOT NULL,
+	[PosText] [nvarchar](255) NULL,
+	[PositionID] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[BookingInjection]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[BookingInjection](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](100) NOT NULL,
+	[Birthday] [date] NULL,
+	[SDTInject] [nvarchar](15) NULL,
+	[NameContact] [nvarchar](100) NULL,
+	[DateInject] [date] NULL,
+	[SDT] [nvarchar](15) NULL,
+	[Email] [nvarchar](100) NULL,
+	[IDUser] [int] NULL,
+	[IDCenter] [int] NULL,
+	[CreateDate] [datetime] NULL,
+	[status] [nvarchar](50) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[BookingInjectionDetail]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[BookingInjectionDetail](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](100) NOT NULL,
+	[Price] [int] NULL,
+	[IDBooking] [int] NOT NULL,
+	[CreateDate] [datetime] NULL,
+	[typevaccine] [nvarchar](50) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CountryItem]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CountryItem](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[NameCountry] [nvarchar](255) NOT NULL,
+	[isDeleted] [bit] NOT NULL,
+	[isActive] [bit] NOT NULL,
+	[CreateDate] [datetime] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ErrorCodes]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ErrorCodes](
+	[ErrorCode] [int] NOT NULL,
+	[ErrorMessage] [nvarchar](255) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ErrorCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Messages]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Messages](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Sender] [nvarchar](100) NULL,
+	[Receiver] [nvarchar](100) NULL,
+	[MessageContent] [nvarchar](500) NULL,
+	[Timestamp] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PackageItem]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PackageItem](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NOT NULL,
+	[Price] [int] NULL,
+	[TypePack] [nvarchar](100) NOT NULL,
+	[ShortContent] [nvarchar](500) NULL,
+	[FullContent] [nvarchar](max) NULL,
+	[LinkImages] [nvarchar](1000) NULL,
+	[CreateDate] [datetime] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[LinkRoute] [nvarchar](255) NULL,
+	[AK] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PositionBanner]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PositionBanner](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[PositionCode] [nvarchar](255) NOT NULL,
+	[Name] [nvarchar](255) NOT NULL,
+	[CreatedAt] [datetime] NULL,
+	[IsActive] [bit] NOT NULL,
+	[IsDelete] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Post]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Post](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ShortContent] [nvarchar](max) NOT NULL,
+	[FullContentDesktop] [nvarchar](max) NOT NULL,
+	[LinkImages] [nvarchar](255) NOT NULL,
+	[CreateDate] [datetime] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[LinkRoute] [nvarchar](255) NOT NULL,
+	[Title] [nvarchar](255) NULL,
+	[FullContentMobile] [nvarchar](max) NULL,
+	[PostType] [nvarchar](255) NULL,
+	[TyK] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PostType]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PostType](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[NameType] [nvarchar](255) NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[SingleItem]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[SingleItem](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NOT NULL,
+	[Price] [int] NOT NULL,
+	[CountryItem] [nvarchar](100) NULL,
+	[ShortContent] [nvarchar](500) NULL,
+	[FullContent] [nvarchar](max) NULL,
+	[LinkImages] [nvarchar](max) NULL,
+	[CreateDate] [datetime] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[LinkRoute] [nvarchar](max) NULL,
+	[AgeType] [nvarchar](255) NULL,
+	[CtK] [int] NULL,
+	[AK] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[VaccineCenter]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[VaccineCenter](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NOT NULL,
+	[Address] [nvarchar](255) NOT NULL,
+	[City] [nvarchar](100) NOT NULL,
+	[District] [nvarchar](100) NOT NULL,
+	[Ward] [nvarchar](100) NULL,
+	[CreateDate] [datetime] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[LinkGoogle] [nvarchar](1000) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[YeahOldItem]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[YeahOldItem](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[NameYearOld] [nvarchar](255) NOT NULL,
+	[CreateDate] [datetime] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET IDENTITY_INSERT [dbo].[Account] ON 
+GO
+INSERT [dbo].[Account] ([ID], [Email], [Password], [SDT], [isActive], [isDeleted], [Admin], [CreateDate], [GoogleId]) VALUES (1, N'manhduc132003@gmail.com', NULL, NULL, 1, 0, 0, CAST(N'2025-08-06T00:07:18.700' AS DateTime), N'112863709985281742194')
+GO
+INSERT [dbo].[Account] ([ID], [Email], [Password], [SDT], [isActive], [isDeleted], [Admin], [CreateDate], [GoogleId]) VALUES (2, N'admin@n', N'123', NULL, 1, 0, 1, CAST(N'2025-08-06T00:08:09.413' AS DateTime), NULL)
+GO
+SET IDENTITY_INSERT [dbo].[Account] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Banner] ON 
+GO
+INSERT [dbo].[Banner] ([ID], [Name], [LinkImages], [Description], [IsDeleted], [IsActive], [CreateDate], [PosText], [PositionID]) VALUES (1, N'banner1', N'https://res.cloudinary.com/dumx42hqq/image/upload/v1754413773/BannerMADUVaccine/ahdubnbbzuiiflp8khnt.png', N'banner1', 0, 1, CAST(N'2025-08-06T00:10:05.320' AS DateTime), N'banner1', NULL)
+GO
+INSERT [dbo].[Banner] ([ID], [Name], [LinkImages], [Description], [IsDeleted], [IsActive], [CreateDate], [PosText], [PositionID]) VALUES (2, N'a', N'https://res.cloudinary.com/dumx42hqq/image/upload/v1754413913/BannerMADUVaccine/jpkvczozj1n0shwejxxm.png', N'a', 0, 1, CAST(N'2025-08-06T00:12:00.147' AS DateTime), N'first-home-banner-md', NULL)
+GO
+INSERT [dbo].[Banner] ([ID], [Name], [LinkImages], [Description], [IsDeleted], [IsActive], [CreateDate], [PosText], [PositionID]) VALUES (3, N'a', N'https://res.cloudinary.com/dumx42hqq/image/upload/v1754413913/BannerMADUVaccine/jpkvczozj1n0shwejxxm.png', N'a', 0, 1, CAST(N'2025-08-06T00:12:20.977' AS DateTime), N'first-home-banner-md', NULL)
+GO
+INSERT [dbo].[Banner] ([ID], [Name], [LinkImages], [Description], [IsDeleted], [IsActive], [CreateDate], [PosText], [PositionID]) VALUES (4, N'a', N'https://res.cloudinary.com/dumx42hqq/image/upload/v1754413913/BannerMADUVaccine/jpkvczozj1n0shwejxxm.png', N'a', 0, 1, CAST(N'2025-08-06T00:12:24.600' AS DateTime), N'first-home-banner-md', NULL)
+GO
+SET IDENTITY_INSERT [dbo].[Banner] OFF
+GO
+SET IDENTITY_INSERT [dbo].[BookingInjection] ON 
+GO
+INSERT [dbo].[BookingInjection] ([ID], [Name], [Birthday], [SDTInject], [NameContact], [DateInject], [SDT], [Email], [IDUser], [IDCenter], [CreateDate], [status]) VALUES (1, N'duc', CAST(N'2003-03-01' AS Date), N'0338988152', N'duc', CAST(N'3000-02-01' AS Date), N'0338988152', N'manhduc132003@gmail.com', 1, 1, CAST(N'2025-08-06T00:16:59.113' AS DateTime), N'PROCESSING')
+GO
+SET IDENTITY_INSERT [dbo].[BookingInjection] OFF
+GO
+SET IDENTITY_INSERT [dbo].[PositionBanner] ON 
+GO
+INSERT [dbo].[PositionBanner] ([ID], [PositionCode], [Name], [CreatedAt], [IsActive], [IsDelete]) VALUES (1, N'banner1', N'1', CAST(N'2025-08-06T00:09:01.057' AS DateTime), 1, 0)
+GO
+INSERT [dbo].[PositionBanner] ([ID], [PositionCode], [Name], [CreatedAt], [IsActive], [IsDelete]) VALUES (2, N'first-home-banner-md', N'a', CAST(N'2025-08-06T00:11:41.847' AS DateTime), 1, 0)
+GO
+SET IDENTITY_INSERT [dbo].[PositionBanner] OFF
+GO
+SET IDENTITY_INSERT [dbo].[VaccineCenter] ON 
+GO
+INSERT [dbo].[VaccineCenter] ([ID], [Name], [Address], [City], [District], [Ward], [CreateDate], [IsActive], [IsDeleted], [LinkGoogle]) VALUES (1, N'1', N'61/9a TX33', N'Thành phố Hồ Chí Minh', N'Quận 12', N'Phường Thạnh Xuân', CAST(N'2025-08-06T00:13:41.160' AS DateTime), 1, 0, N'https://www.google.com/maps/place/61+%C4%90.+TX+33,+Th%E1%BA%A1nh+Xu%C3%A2n,+Qu%E1%BA%ADn+12,+H%E1%BB%93+Ch%C3%AD+Minh,+Vi%E1%BB%87t+Nam/@10.8852928,106.6737491,17z/data=!3m1!4b1!4m6!3m5!1s0x3174d62ca2ce50d3:0xa5fa84bf022bfe54!8m2!3d10.8852875!4d106.676324!16s%2Fg%2F11knkw1f87!5m1!1e1?entry=ttu&g_ep=EgoyMDI1MDczMC4wIKXMDSoASAFQAw%3D%3D')
+GO
+SET IDENTITY_INSERT [dbo].[VaccineCenter] OFF
+GO
+SET IDENTITY_INSERT [dbo].[YeahOldItem] ON 
+GO
+INSERT [dbo].[YeahOldItem] ([ID], [NameYearOld], [CreateDate], [IsActive], [IsDeleted]) VALUES (1, N'200', CAST(N'2025-08-06T00:00:52.367' AS DateTime), 1, 0)
+GO
+SET IDENTITY_INSERT [dbo].[YeahOldItem] OFF
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UQ__Account__A9D10534A0A93DB0]    Script Date: 5/12/2026 5:03:15 PM ******/
+ALTER TABLE [dbo].[Account] ADD UNIQUE NONCLUSTERED 
+(
+	[Email] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Account] ADD  DEFAULT ((1)) FOR [isActive]
+GO
+ALTER TABLE [dbo].[Account] ADD  DEFAULT ((0)) FOR [isDeleted]
+GO
+ALTER TABLE [dbo].[Account] ADD  DEFAULT ((0)) FOR [Admin]
+GO
+ALTER TABLE [dbo].[Account] ADD  DEFAULT (dateadd(hour,(7),getutcdate())) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[Banner] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[Banner] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[Banner] ADD  DEFAULT (getdate()) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[BookingInjection] ADD  DEFAULT (getdate()) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[BookingInjection] ADD  DEFAULT ('PROCESSING') FOR [status]
+GO
+ALTER TABLE [dbo].[BookingInjectionDetail] ADD  DEFAULT (getdate()) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[CountryItem] ADD  DEFAULT ((0)) FOR [isDeleted]
+GO
+ALTER TABLE [dbo].[CountryItem] ADD  DEFAULT ((1)) FOR [isActive]
+GO
+ALTER TABLE [dbo].[CountryItem] ADD  DEFAULT (getdate()) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[Messages] ADD  DEFAULT (getdate()) FOR [Timestamp]
+GO
+ALTER TABLE [dbo].[PackageItem] ADD  DEFAULT (getdate()) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[PackageItem] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[PackageItem] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[PositionBanner] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[PositionBanner] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[PositionBanner] ADD  DEFAULT ((0)) FOR [IsDelete]
+GO
+ALTER TABLE [dbo].[Post] ADD  DEFAULT (getdate()) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[Post] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[Post] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[PostType] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[PostType] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[SingleItem] ADD  DEFAULT (getdate()) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[SingleItem] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[SingleItem] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[VaccineCenter] ADD  DEFAULT (getdate()) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[VaccineCenter] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[VaccineCenter] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[YeahOldItem] ADD  DEFAULT (getdate()) FOR [CreateDate]
+GO
+ALTER TABLE [dbo].[YeahOldItem] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[YeahOldItem] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[Banner]  WITH CHECK ADD  CONSTRAINT [FK_Banner_PositionBanner] FOREIGN KEY([PositionID])
+REFERENCES [dbo].[PositionBanner] ([ID])
+GO
+ALTER TABLE [dbo].[Banner] CHECK CONSTRAINT [FK_Banner_PositionBanner]
+GO
+ALTER TABLE [dbo].[BookingInjection]  WITH CHECK ADD  CONSTRAINT [FK_BookingInjection_Account] FOREIGN KEY([IDUser])
+REFERENCES [dbo].[Account] ([ID])
+GO
+ALTER TABLE [dbo].[BookingInjection] CHECK CONSTRAINT [FK_BookingInjection_Account]
+GO
+ALTER TABLE [dbo].[BookingInjection]  WITH CHECK ADD  CONSTRAINT [FK_BookingInjection_VaccineCenter] FOREIGN KEY([IDCenter])
+REFERENCES [dbo].[VaccineCenter] ([ID])
+GO
+ALTER TABLE [dbo].[BookingInjection] CHECK CONSTRAINT [FK_BookingInjection_VaccineCenter]
+GO
+ALTER TABLE [dbo].[BookingInjectionDetail]  WITH CHECK ADD  CONSTRAINT [FK_BookingInjectionDetail_BookingInjection] FOREIGN KEY([IDBooking])
+REFERENCES [dbo].[BookingInjection] ([ID])
+GO
+ALTER TABLE [dbo].[BookingInjectionDetail] CHECK CONSTRAINT [FK_BookingInjectionDetail_BookingInjection]
+GO
+ALTER TABLE [dbo].[PackageItem]  WITH CHECK ADD  CONSTRAINT [FK_PackageItem_YeahOldItem] FOREIGN KEY([AK])
+REFERENCES [dbo].[YeahOldItem] ([ID])
+GO
+ALTER TABLE [dbo].[PackageItem] CHECK CONSTRAINT [FK_PackageItem_YeahOldItem]
+GO
+ALTER TABLE [dbo].[Post]  WITH CHECK ADD  CONSTRAINT [FK_Post_PostType] FOREIGN KEY([TyK])
+REFERENCES [dbo].[PostType] ([ID])
+GO
+ALTER TABLE [dbo].[Post] CHECK CONSTRAINT [FK_Post_PostType]
+GO
+ALTER TABLE [dbo].[SingleItem]  WITH CHECK ADD  CONSTRAINT [FK_SingleItem_CountryItem] FOREIGN KEY([CtK])
+REFERENCES [dbo].[CountryItem] ([ID])
+GO
+ALTER TABLE [dbo].[SingleItem] CHECK CONSTRAINT [FK_SingleItem_CountryItem]
+GO
+ALTER TABLE [dbo].[SingleItem]  WITH CHECK ADD  CONSTRAINT [FK_SingleItem_YeahOldItem] FOREIGN KEY([AK])
+REFERENCES [dbo].[YeahOldItem] ([ID])
+GO
+ALTER TABLE [dbo].[SingleItem] CHECK CONSTRAINT [FK_SingleItem_YeahOldItem]
+GO
+/****** Object:  StoredProcedure [dbo].[ExecAccount]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecAccount]
+    @Type varchar(50) = 'Get-by-ID',
+	@ID int = 3,
+	@UserAuth nvarchar(255) = 'manhduc1320033@gmail.com',
+	@Password nvarchar(255) = '135790@Duc',
+	@Email nvarchar(255) = 'manhduc1320033@gmail.com',
+	@SDT nvarchar(255) = '',
+	@IsActive bit = 1,
+	@NewPassword nvarchar(255) = '',
+	@GoogleId nvarchar (1000) = ''
+AS
+BEGIN
+	IF @Type NOT IN ('Auth-Login','Auth-Register','Get-Data','Delete','UpdateActive','EditBy-ID','Get-by-ID','Recharge-Password','Google-Login','Forget-Password')
+	BEGIN
+		select 400 ErrorCode, dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+
+
+	DECLARE @Sql NVARCHAR(MAX) = ''
+	IF @Type = 'Auth-Login'
+	BEGIN
+		IF (select count(*) from VaccineCategory.dbo.Account where Email = @UserAuth or SDT = @UserAuth) >= 1
+		BEGIN
+			IF(select count(*) from VaccineCategory.dbo.Account where (Email = @UserAuth OR SDT = @UserAuth) AND Password = @Password AND isActive = 1 AND isDeleted = 0) >= 1
+			BEGIN
+				SELECT TOP(1)  ID,Email ,Admin, 0 ErrorCode, dbo.GetErrorMessage(4) AS ErrorMessage
+				FROM VaccineCategory.dbo.Account
+				WHERE (Email = @UserAuth OR SDT = @UserAuth) AND Password = @Password AND isActive = 1 AND isDeleted = 0
+				GOTO THOAT
+			END
+			ELSE
+			BEGIN
+				SELECT 401 ErrorCode,dbo.GetErrorMessage(6) AS ErrorMessage
+				GOTO THOAT
+			END
+		END
+		ELSE
+		BEGIN
+			SELECT 400 ErrorCode,dbo.GetErrorMessage(5) AS ErrorMessage
+			GOTO THOAT
+		END
+	END
+	
+	IF @Type = 'Auth-Register'
+	BEGIN
+		DECLARE @GETDATENOW DATETIME = GETDATE()
+		IF (select count(*) from VaccineCategory.dbo.Account where Email = @Email or SDT = @SDT) >= 1
+		BEGIN
+			SELECT 400 ErrorCode,dbo.GetErrorMessage(7) AS ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			INSERT INTO VaccineCategory.dbo.Account(Email, SDT, Password,CreateDate) 
+			VALUES (@Email, @SDT, @Password,@GETDATENOW)
+			SELECT 0 ErrorCode,dbo.GetErrorMessage(8) AS ErrorMessage
+			GOTO THOAT
+		END
+	END
+
+	IF @Type = 'Get-Data'
+	BEGIN
+		select * from VaccineCategory.dbo.Account WHERE isDeleted = 0 order by CreateDate ASC
+		GOTO THOAT
+	END
+
+	IF @Type = 'EditBy-ID'
+	BEGIN
+		UPDATE VaccineCategory.dbo.Account
+		SET Email = @Email,
+			Password = @Password,
+			SDT = @SDT
+		WHERE ID = @ID
+    
+		IF @@ROWCOUNT > 0
+		BEGIN
+			SELECT 0 AS ErrorCode, dbo.GetErrorMessage(0) AS ErrorMessage
+		END
+		ELSE
+		BEGIN
+			SELECT 400 AS ErrorCode, dbo.GetErrorMessage(9) AS ErrorMessage
+		END
+
+		GOTO THOAT
+	END
+
+
+	IF @Type = 'Delete'
+	BEGIN
+		UPDATE VaccineCategory.dbo.Account
+		SET 
+			isDeleted = 1
+		WHERE ID = @ID
+		SELECT 0 ErrorCode,dbo.GetErrorMessage(0) ErrorMessage
+		GOTO THOAT
+	END
+
+	IF @Type = 'UpdateActive'
+	BEGIN
+		if @IsActive = 1
+		BEGIN
+			UPDATE VaccineCategory.dbo.Account
+			SET 
+				isActive = 1
+			WHERE ID = @ID
+			SELECT 0 ErrorCode,dbo.GetErrorMessage(0) ErrorMessage
+			GOTO THOAT
+		END
+		if @IsActive = 0
+		BEGIN
+			UPDATE VaccineCategory.dbo.Account
+			SET 
+				isActive = 0
+			WHERE ID = @ID
+			SELECT 0 ErrorCode,dbo.GetErrorMessage(0) ErrorMessage
+			GOTO THOAT
+		END
+	END
+
+	IF @Type = 'Get-by-ID'
+	BEGIN
+		SELECT TOP(1) * FROM VaccineCategory.dbo.Account WHERE ID = @ID
+	END
+
+	IF @Type = 'Recharge-Password'
+	BEGIN
+		IF (SELECT COUNT(*) FROM VaccineCategory.dbo.Account WHERE ID = @ID AND Password = @Password) >= 1
+		BEGIN
+			UPDATE VaccineCategory.dbo.Account
+			SET Password = @NewPassword
+			WHERE ID = @ID
+    
+			IF @@ROWCOUNT > 0
+			BEGIN
+				SELECT 0 AS ErrorCode, dbo.GetErrorMessage(0) AS ErrorMessage
+			END
+			ELSE
+			BEGIN
+				SELECT 400 AS ErrorCode, dbo.GetErrorMessage(9) AS ErrorMessage
+			END
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			SELECT 400 AS ErrorCode, N'Mật khẩu sai' ErrorMessage
+			GOTO THOAT
+		END
+
+
+		
+	END
+
+	IF @Type = 'Google-Login'
+	BEGIN
+		DECLARE @UserId INT
+        SELECT TOP(1) @UserId = ID FROM Account WHERE GoogleId = @GoogleId OR Email = @Email AND isActive = 1 AND isDeleted = 0
+
+		IF @UserId IS NULL
+		BEGIN
+			INSERT INTO VaccineCategory.dbo.Account
+			(Email,GoogleId)
+			VALUES
+			(@Email, @GoogleId)
+			SET @UserId = SCOPE_IDENTITY()
+		END
+		ELSE
+		BEGIN
+			UPDATE VaccineCategory.dbo.Account
+			SET GoogleId = @GoogleId
+			WHERE ID = @UserId
+
+		END
+
+		SELECT TOP(1)  ID,Email ,Admin, 0 ErrorCode, dbo.GetErrorMessage(4) AS ErrorMessage
+				FROM VaccineCategory.dbo.Account
+				WHERE @UserId = ID AND isActive = 1 AND isDeleted = 0
+
+	END
+	
+	IF @Type = 'Forget-Password'
+	BEGIN
+			DECLARE @RandomString NVARCHAR(50)
+			DECLARE @Length INT = 12
+			SET @RandomString = 'madu'
+			WHILE LEN(@RandomString) < @Length + 4
+			BEGIN
+				SET @RandomString = @RandomString + CHAR(ASCII('a') + (ABS(CHECKSUM(NEWID())) % 26))
+			END
+
+		SELECT  TOP(1) @UserId = ID FROM VaccineCategory.dbo.Account WHERE Email = @Email OR SDT = @SDT
+
+		IF @UserId Is NULL 
+		BEGIN
+			SELECT 400 ErrorCode,dbo.GetErrorMessage(5) ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			UPDATE VaccineCategory.dbo.Account
+			SET Password = @RandomString
+			WHERE @UserId = ID
+
+			SELECT Email, Password,0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage FROM VaccineCategory.dbo.Account WHERE @UserId = ID
+		END
+		
+	END
+	
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecAgeItem]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecAgeItem]
+    @Type varchar(50) = 'GET-AGE-ITEM',
+	@ID int = 1,
+	@NameYearOld nvarchar(255) = N'Việt Nam',
+	@IsActive bit = 1
+AS
+BEGIN
+	IF @Type NOT IN ('INSERT-AGE','GET-AGE-ITEM','EDITAGE-BYID','ACTIVE-AGE','DELETE-AGE','GET-AGE-PUBLIC')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+	DECLARE @Sql nvarchar(255) = ''
+	IF @Type = 'INSERT-AGE'
+	BEGIN
+		BEGIN TRY
+			IF EXISTS (
+				SELECT 1 
+				FROM VaccineCategory.dbo.YeahOldItem 
+				WHERE NameYearOld = @NameYearOld
+			)
+			BEGIN
+				IF (SELECT COUNT(*) FROM VaccineCategory.dbo.YeahOldItem WHERE isDeleted = 1 AND @NameYearOld = @NameYearOld) >= 1
+				BEGIN
+					UPDATE VaccineCategory.dbo.YeahOldItem
+					SET isDeleted = 0
+					WHERE NameYearOld = @NameYearOld;
+				END
+				SELECT 400 ErrorCode, dbo.GetErrorMessage(2) ErrorMessage;
+				GOTO THOAT
+			END
+			ELSE
+			BEGIN
+				DECLARE @GETDATENOW DATETIME = DATEADD(HOUR, 7, GETUTCDATE());
+
+				INSERT INTO VaccineCategory.dbo.YeahOldItem (NameYearOld, CreateDate) 
+				VALUES (@NameYearOld, @GETDATENOW);
+
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+				GOTO THOAT
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+			GOTO THOAT
+		END CATCH
+	END
+
+	IF @Type  = 'GET-AGE-ITEM'
+	BEGIN
+		SELECT *,dbo.GetErrorMessage(0) ErrorMessage FROM VaccineCategory.dbo.YeahOldItem WHERE isDeleted = 0
+		GOTO THOAT
+	END
+
+	IF @Type  = 'GET-AGE-PUBLIC'
+	BEGIN
+		SELECT ID,NameYearOld,CreateDate,dbo.GetErrorMessage(0) ErrorMessage FROM VaccineCategory.dbo.YeahOldItem WHERE isActive = 1 AND isDeleted = 0
+		GOTO THOAT
+	END
+
+	IF @Type = 'EDITAGE-BYID'
+	BEGIN
+		BEGIN TRY
+			IF NOT EXISTS (
+				SELECT 1 
+				FROM VaccineCategory.dbo.YeahOldItem 
+				WHERE ID = @ID
+			)
+			BEGIN
+				SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+				GOTO THOAT
+			END
+			ELSE IF EXISTS (
+				SELECT 1 
+				FROM VaccineCategory.dbo.YeahOldItem 
+				WHERE NameYearOld = @NameYearOld AND ID <> @ID
+			)
+			BEGIN
+				SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+				GOTO THOAT
+			END
+			ELSE
+			BEGIN
+				UPDATE VaccineCategory.dbo.YeahOldItem
+				SET 
+					NameYearOld = @NameYearOld
+				WHERE ID = @ID;
+
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+				GOTO THOAT
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+			GOTO THOAT
+		END CATCH
+	END
+
+	IF @Type = 'ACTIVE-AGE'
+	BEGIN
+		IF @IsActive = 1
+		BEGIN
+			UPDATE dbo.YeahOldItem 
+			SET isActive = 1
+			WHERE ID = @ID
+			SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+			GOTO THOAT
+		END
+		IF @IsActive = 0
+		BEGIN
+			UPDATE dbo.YeahOldItem 
+			SET isActive = 0
+			WHERE ID = @ID
+			SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+			GOTO THOAT
+		END
+
+	END
+
+	IF @Type = 'DELETE-AGE'
+	BEGIN
+		BEGIN TRY
+			UPDATE VaccineCategory.dbo.YeahOldItem
+			SET isDeleted = 1
+			WHERE ID = @ID;
+
+			IF @@ROWCOUNT = 0
+			BEGIN
+				SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+				GOTO THOAT
+			END
+			ELSE
+			BEGIN
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+				GOTO THOAT
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT ERROR_NUMBER() ErrorCode, ERROR_MESSAGE() ErrorMessage;
+			GOTO THOAT
+		END CATCH
+	END
+
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecBanner]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecBanner]
+    @Type varchar(50) = 'add-banner',
+	@Name nvarchar(255)= N'Banner đầu',
+	@Description nvarchar(max)= N'VÃI',
+	@LinkImages nvarchar(max)='img',
+	@PosText nvarchar(255) = '',
+	@ID int = 9999999
+AS
+BEGIN
+	IF @Type NOT IN ('GET','ADD-BANNER','DELETE','UPDATE-BY-ID','GET-BYPOSTEXT')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+	DECLARE @Sql nvarchar(255) = ''
+	IF @Type = 'GET'
+	BEGIN
+		select ID, Name, Description, CreateDate, LinkImages, PosText 
+		from VaccineCategory.dbo.Banner
+		where IsDeleted = 0 AND IsActive = 1
+		GOTO THOAT
+	END
+
+	IF @Type = 'GET-BYPOSTEXT'
+	BEGIN
+		if (select count(*) from VaccineCategory.dbo.Banner where PosText = @PosText) <= 0
+		begin
+			SELECT dbo.GetErrorMessage(1) AS ErrorMessage
+			goto thoat
+		end
+		else
+		begin
+			select ID, Name, Description, CreateDate, LinkImages, PosText 
+			from VaccineCategory.dbo.Banner
+			where IsDeleted = 0 AND IsActive = 1 AND PosText = @PosText
+			SELECT dbo.GetErrorMessage(3) AS ErrorMessage
+			GOTO THOAT
+		end
+	END
+
+	IF @Type = 'ADD-BANNER'
+	BEGIN
+		declare @getdatenow datetime = GETDATE()
+		INSERT INTO Banner (Name, LinkImages, Description, PosText)
+		VALUES (@Name, @LinkImages,@Description,@PosText);
+		exec(@sql)
+		SELECT dbo.GetErrorMessage(0) AS ErrorMessage
+		goto THOAT
+	END
+
+	IF @Type = 'DELETE'
+	BEGIN
+		IF NOT EXISTS (SELECT 1 FROM VaccineCategory.dbo.Banner WHERE ID = @ID)
+		BEGIN
+			SELECT @ID ID, dbo.GetErrorMessage(3) AS ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			UPDATE VaccineCategory.dbo.Banner
+			SET IsDeleted = 1
+			WHERE ID = @ID;
+			SELECT dbo.GetErrorMessage(0) AS ErrorMessage
+			GOTO THOAT
+		END
+	END
+
+	IF @Type = 'UPDATE-BY-ID'
+	BEGIN
+		IF NOT EXISTS (SELECT 1 FROM VaccineCategory.dbo.Banner WHERE ID = @ID)
+		BEGIN
+			SELECT dbo.GetErrorMessage(3) AS ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			UPDATE VaccineCategory.dbo.Banner
+			SET Name = @Name,
+				PosText = @PosText,
+				Description = @Description,
+				LinkImages = @LinkImages
+			WHERE ID = @ID;
+
+			SELECT dbo.GetErrorMessage(0) AS ErrorMessage
+			GOTO THOAT
+		END
+	END
+
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecBooking]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecBooking]
+    @Type varchar(50) = 'SCAN-DAILY',
+	@Name nvarchar(255) = '',
+	@Birthday DATE = '',
+	@SDTInject nvarchar(15) = '',
+	@NameContact nvarchar(255)= '',
+	@DateInject DATE = '',
+	@SDT nvarchar(15) = '',
+	@Email nvarchar(100) = '',
+	@IDUser INT = 21,
+	@IDCenter INT ='',
+	@vaccinepack nvarchar(max) = '',
+	@vaccinesingle nvarchar(max) = '',
+	@typyvaccine nvarchar(50) = '',
+	@BookID int = 17,
+	@NewStatus nvarchar(50) = 'CONFIRMED',
+	@ID INT = 17
+AS
+BEGIN
+	IF @Type NOT IN ('BOOKING','GET-DATA-CHART','GET-DATA-BY-BOOKINGID','GET-DATA-BY-ID-USER','UPDATE-STATUS','SCAN-DAILY')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+	DECLARE @Sql nvarchar(255) = ''
+	--SELECT * FROM VaccineCategory.dbo.BookingInjection
+
+
+	IF @Type = 'BOOKING'
+	BEGIN
+		IF @Name IS NULL OR @Name = '' 
+			OR @Birthday IS NULL 
+			OR @NameContact IS NULL OR @NameContact = '' 
+			OR @DateInject IS NULL 
+			OR @SDT IS NULL OR @SDT = '' 
+			OR @Email IS NULL OR @Email = '' 
+			OR @IDUser IS NULL 
+			OR @IDCenter IS NULL
+		BEGIN
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(11) ErrorMessage;
+			GOTO THOAT
+		END
+
+		BEGIN TRY
+			DECLARE @GETDATENOW DATE = GETDATE();
+
+			INSERT INTO VaccineCategory.dbo.BookingInjection(Name, Birthday, SDTInject, NameContact, DateInject, SDT, Email, IDUser, IDCenter)
+			VALUES(@Name, @Birthday, @SDTInject, @NameContact, @DateInject, @SDT, @Email, @IDUser, @IDCenter);
+
+			DECLARE @BookingID INT = SCOPE_IDENTITY();
+
+			INSERT INTO VaccineCategory.dbo.BookingInjectionDetail (IDBooking, Name, Price, typevaccine)
+			SELECT 
+				@BookingID AS IDBooking,
+				JSON_VALUE(value, '$.Name') AS Name,
+				JSON_VALUE(value, '$.Price') AS Price,
+				'PACK'
+			FROM OPENJSON(@vaccinepack);
+
+			INSERT INTO VaccineCategory.dbo.BookingInjectionDetail (IDBooking, Name, Price, typevaccine)
+			SELECT 
+				@BookingID AS IDBooking,
+				JSON_VALUE(value, '$.Name') AS Name,
+				JSON_VALUE(value, '$.Price') AS Price,
+				'SINGLE'
+			FROM OPENJSON(@vaccinesingle);
+
+			SELECT *, 
+				   @BookingID BookingID, 
+				   @Email Email, 
+				   0 ErrorCode, 
+				   dbo.GetErrorMessage(0) ErrorMessage, 
+				   CONVERT(VARCHAR, DateInject, 105) AS FormattedDateInject
+			FROM BookingInjection
+			WHERE ID = @BookingID;
+
+
+			GOTO THOAT;
+		END TRY
+		BEGIN CATCH
+			-- Xử lý lỗi
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+		END CATCH
+	END
+
+	IF @TYPE = 'GET-DATA-CHART'
+	BEGIN
+		SELECT 
+			CAST(CreateDate AS DATE) AS DateOnly, 
+			COUNT(*) AS TotalBookings
+		FROM VaccineCategory.dbo.BookingInjection
+		GROUP BY CAST(CreateDate AS DATE) 
+		ORDER BY DateOnly;
+	END
+
+	IF @TYPE = 'GET-DATA-BY-BOOKINGID'
+	BEGIN
+		SELECT 
+			BI.ID,
+			BI.Name,
+			BI.Birthday,
+			BI.SDTInject,
+			BI.NameContact,
+			BI.DateInject,
+			BI.IDUser,
+			BI.IDCenter,
+			BI.SDT AS SDT,
+			BI.status,
+			VC.Name as NameCenter,
+			STRING_AGG(BID.Name, ', ') AS VaccineNames, 
+			STRING_AGG(CAST(BID.Price AS VARCHAR), ', ') AS VaccinePrices, 
+			STRING_AGG(BID.TypeVaccine, ', ') AS VaccineTypes,
+			CONCAT(VC.Address, ', ', VC.Ward, ', ', VC.District, ', ', VC.City) AS Address
+		FROM 
+			BookingInjection BI
+		LEFT JOIN 
+			BookingInjectionDetail BID ON BI.ID = BID.IDBooking
+		LEFT JOIN 
+			VaccineCenter VC ON BI.IDCenter = VC.ID
+		GROUP BY
+			BI.ID, BI.Name, BI.Birthday, BI.SDTInject, BI.NameContact, 
+			BI.DateInject, BI.SDT, BI.IDUser, BI.IDCenter, BI.status, BI.CreateDate,BI.CreateDate, VC.Address, VC.Ward, VC.District, VC.City,VC.Name
+		ORDER BY 
+			BI.CreateDate DESC;
+
+
+	END
+	
+	IF @TYPE = 'GET-DATA-BY-ID-USER'
+	BEGIN
+		SELECT 
+			BI.ID,
+			BI.Name,
+			BI.Birthday,
+			BI.SDTInject,
+			BI.NameContact,
+			BI.DateInject,
+			BI.IDUser,
+			BI.IDCenter,
+			BI.SDT AS SDT,
+			BI.status,
+			VC.Name as NameCenter,
+			STRING_AGG(BID.Name, ', ') AS VaccineNames,
+			STRING_AGG(CAST(BID.Price AS VARCHAR), ', ') AS VaccinePrices,
+			STRING_AGG(BID.TypeVaccine, ', ') AS VaccineTypes,
+			
+			CONCAT(VC.Address, ', ', VC.Ward, ', ', VC.District, ', ', VC.City) AS Address
+		FROM 
+			BookingInjection BI
+		LEFT JOIN 
+			BookingInjectionDetail BID ON BI.ID = BID.IDBooking
+		LEFT JOIN 
+			VaccineCenter VC ON BI.IDCenter = VC.ID 
+		WHERE 
+			BI.IDUser = @IDUser
+		GROUP BY
+			BI.ID, BI.Name, BI.Birthday, BI.SDTInject, BI.NameContact, 
+			BI.DateInject, BI.SDT, BI.IDUser, BI.IDCenter, BI.status, BI.CreateDate, VC.Address, VC.Ward, VC.District, VC.City,VC.Name
+		ORDER BY 
+			BI.CreateDate DESC;
+		GOTO THOAT
+	END
+	
+	IF @TYPE = 'UPDATE-STATUS'
+	BEGIN
+		BEGIN TRY
+			UPDATE VaccineCategory.dbo.BookingInjection
+			SET status = @NewStatus
+			WHERE ID =  @ID
+			SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+		END TRY
+		BEGIN CATCH
+		END CATCH
+
+	END
+
+	IF @TYPE = 'SCAN-DAILY'
+	BEGIN
+		-- 1. Cập nhật các bản ghi đã quá hạn thành 'EXPIRED' theo giờ Việt Nam
+		UPDATE BookingInjection
+		SET Status = 'EXPIRED'
+		WHERE DateInject < DATEADD(DAY, -1, DATEADD(HOUR, 7, GETUTCDATE())) AND Status != 'EXPIRED' AND status !='CANCELED';
+
+
+		-- 2. Lấy các bản ghi có DateInject là ngày hôm nay theo giờ Việt Nam
+		SELECT 
+			b.*, 
+			CONVERT(VARCHAR, b.DateInject, 105) AS FormattedDateInject,
+			CONCAT(c.Address, ', ',c.Ward, ', ', c.District, ', ', c.City) AS Address,
+			c.Name as namecenter
+		FROM 
+			BookingInjection b
+		JOIN 
+			VaccineCenter c ON b.IDCenter = c.ID
+		WHERE 
+			CAST(b.DateInject AS DATE) = CAST(DATEADD(HOUR, 7, GETUTCDATE()) AS DATE);
+
+
+	END
+
+
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecCountryItem]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecCountryItem]
+    @Type varchar(50) = 'ACTIVE-COUNTRY',
+	@ID int = 1,
+	@NameCountry nvarchar(255) = N'Việt Nam',
+	@IsActive bit = 1
+AS
+BEGIN
+	IF @Type NOT IN ('INSERT-COUNTRY','GET-COUNTRY','EDITCOUNTRY-BYID','ACTIVE-COUNTRY','DELETE-COUNTRY','GET-COUNTRY-PUBLIC')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+	DECLARE @Sql nvarchar(255) = ''
+	IF @Type = 'INSERT-COUNTRY'
+	BEGIN
+		BEGIN TRY
+			IF EXISTS (
+				SELECT 1 
+				FROM VaccineCategory.dbo.CountryItem 
+				WHERE NameCountry = @NameCountry
+			)
+			BEGIN
+				IF (SELECT COUNT(*) FROM VaccineCategory.dbo.CountryItem WHERE isDeleted = 1 AND NameCountry = @NameCountry) >= 1
+				BEGIN
+					UPDATE VaccineCategory.dbo.CountryItem
+					SET isDeleted = 0
+					WHERE NameCountry = @NameCountry;
+				END
+				SELECT 400 ErrorCode, dbo.GetErrorMessage(2) ErrorMessage;
+				GOTO THOAT
+			END
+			ELSE
+			BEGIN
+				DECLARE @GETDATENOW DATETIME = DATEADD(HOUR, 7, GETUTCDATE());
+
+				INSERT INTO VaccineCategory.dbo.CountryItem (NameCountry, CreateDate) 
+				VALUES (@NameCountry, @GETDATENOW);
+
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+				GOTO THOAT
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+			GOTO THOAT
+		END CATCH
+	END
+
+	IF @Type  = 'GET-COUNTRY'
+	BEGIN
+		SELECT *,dbo.GetErrorMessage(0) ErrorMessage FROM VaccineCategory.dbo.CountryItem WHERE isDeleted = 0
+		GOTO THOAT
+	END
+
+	IF @Type  = 'GET-COUNTRY-PUBLIC'
+	BEGIN
+		SELECT ID,NameCountry,CreateDate,dbo.GetErrorMessage(0) ErrorMessage FROM VaccineCategory.dbo.CountryItem WHERE isActive = 1 AND isDeleted = 0
+		GOTO THOAT
+	END
+
+	IF @Type = 'EDITCOUNTRY-BYID'
+	BEGIN
+		BEGIN TRY
+			IF NOT EXISTS (
+				SELECT 1 
+				FROM VaccineCategory.dbo.CountryItem 
+				WHERE ID = @ID
+			)
+			BEGIN
+				SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+				GOTO THOAT
+			END
+			ELSE IF EXISTS (
+				SELECT 1 
+				FROM VaccineCategory.dbo.CountryItem 
+				WHERE NameCountry = @NameCountry AND ID <> @ID
+			)
+			BEGIN
+				SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+				GOTO THOAT
+			END
+			ELSE
+			BEGIN
+				UPDATE VaccineCategory.dbo.CountryItem
+				SET 
+					NameCountry = @NameCountry
+				WHERE ID = @ID;
+
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+				GOTO THOAT
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+			GOTO THOAT
+		END CATCH
+	END
+
+	IF @Type = 'ACTIVE-COUNTRY'
+	BEGIN
+		IF @IsActive = 1
+		BEGIN
+			UPDATE dbo.CountryItem 
+			SET isActive = 1
+			WHERE ID = @ID
+			SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+			GOTO THOAT
+		END
+		IF @IsActive = 0
+		BEGIN
+			UPDATE dbo.CountryItem 
+			SET isActive = 0
+			WHERE ID = @ID
+			SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+			GOTO THOAT
+		END
+
+	END
+
+	IF @Type = 'DELETE-COUNTRY'
+	BEGIN
+		BEGIN TRY
+			UPDATE VaccineCategory.dbo.CountryItem
+			SET isDeleted = 1
+			WHERE ID = @ID;
+
+			IF @@ROWCOUNT = 0
+			BEGIN
+				SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage;
+				GOTO THOAT
+			END
+			ELSE
+			BEGIN
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage;
+				GOTO THOAT
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT ERROR_NUMBER() ErrorCode, ERROR_MESSAGE() ErrorMessage;
+			GOTO THOAT
+		END CATCH
+	END
+
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecItemPackage]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecItemPackage]
+    @Type varchar(50) = 'GET-PACKAGEITEM-ALL',
+	@ID int = 1,
+	@NameYearOld nvarchar(255) = N'Việt Nam',
+	@IsActive bit = 1,
+	@Name nvarchar(255)  = '',
+	@Price int = 0,
+	@TypePack nvarchar(255) = N'',	
+	@ShortContent nvarchar(255) = '',
+	@FullContent nvarchar(max) = '',
+	@LinkRoute nvarchar(255) = '',
+	@LinkImages nvarchar(255) = '',
+	@IsDeleted bit = 0,
+	@AgeType nvarchar(500) = N''
+AS
+BEGIN
+	IF @Type NOT IN ('GET-PACKAGEITEM-ALL','INSERT-PACK','EDIT-PACK','DELETE-PACK-ITEM','ACTIVE-PACK-ITEM','GET-PACKAGEITEM-PUBLIC','GET-BY-LINKROUTE')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+	DECLARE @Sql nvarchar(255) = ''
+
+	IF @Type = 'GET-PACKAGEITEM-ALL'
+	BEGIN
+		SELECT 
+			*, 
+			0 AS ErrorCode, 
+			dbo.GetErrorMessage(0) AS ErrorMessage,
+			FORMAT(Price, 'N0', 'en-US') AS PriceFormat
+		FROM VaccineCategory.dbo.PackageItem
+		WHERE IsDeleted = 0
+		GOTO thoat
+	END
+
+	IF @Type = 'GET-PACKAGEITEM-PUBLIC'
+	BEGIN
+		SELECT 
+			ID, Name, Price, ShortContent,TypePack,LinkRoute,LinkImages,
+			0 AS ErrorCode, 
+			dbo.GetErrorMessage(0) AS ErrorMessage,
+			FORMAT(Price, 'N0', 'en-US') AS PriceFormat
+		FROM VaccineCategory.dbo.PackageItem
+		WHERE IsDeleted = 0 AND IsActive = 1
+		GOTO thoat
+	END
+
+	IF @Type = 'INSERT-PACK'
+	BEGIN
+		BEGIN TRY
+			IF (SELECT COUNT(*) FROM VaccineCategory.dbo.PackageItem WHERE LinkRoute = @LinkRoute) >= 1
+			BEGIN
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(10) ErrorMessage
+			END
+			ELSE
+			BEGIN
+				INSERT INTO VaccineCategory.dbo.PackageItem(Name,Price,TypePack,ShortContent,FullContent,LinkImages,LinkRoute)
+				VALUES (@Name,@Price,@TypePack,@ShortContent,@FullContent,@LinkImages,@LinkRoute)
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'EDIT-PACK'
+	BEGIN
+		BEGIN TRY
+				UPDATE VaccineCategory.dbo.PackageItem
+				SET	Name = @Name,
+					Price = @Price,
+					TypePack = @TypePack,
+					ShortContent = @ShortContent,
+					FullContent = @FullContent,
+					LinkImages = @LinkImages,
+					LinkRoute = @LinkRoute
+				WHERE ID = @ID
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+ 		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'DELETE-PACK-ITEM'
+	BEGIN
+		BEGIN TRY
+			UPDATE VaccineCategory.dbo.PackageItem
+			SET IsDeleted = 1
+			WHERE ID = @ID 
+			SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'ACTIVE-PACK-ITEM'
+	BEGIN
+		BEGIN TRY
+			IF @IsActive = 0 
+			BEGIN 
+				UPDATE VaccineCategory.dbo.PackageItem
+				SET IsActive = 0
+				WHERE ID = @ID 
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+				GOTO THOAT
+			END
+			IF @IsActive = 1
+			BEGIN 
+				UPDATE VaccineCategory.dbo.PackageItem
+				SET IsActive = 1
+				WHERE ID = @ID 
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+				GOTO THOAT
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+	IF @Type = 'GET-BY-LINKROUTE'
+	BEGIN
+		BEGIN TRY
+			SELECT TOP 1  * FROM VaccineCategory.dbo.PackageItem WHERE LinkRoute = @LinkRoute
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecMenu]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecMenu]
+    @Type varchar(50) = 'GET'
+AS
+BEGIN
+	--IF @Type NOT IN ('GET', 'GET-ACTIVE', 'ADD', 'EDIT', 'DEL', 'GET_BYID')
+	--BEGIN
+	--	SELECT NLConfiguration.dbo.[F_GetDataErrCode]('005', @Language) ErrDescription, '005' Valuerr
+	--	GOTO THOAT
+	--END
+	
+	IF @Type = 'GET'
+	BEGIN
+		select * from VaccineCategory.dbo.Menu
+	END
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecPositionBanner]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecPositionBanner]
+    @Type varchar(50) = 'DELETE',
+	@ID int = 8,
+	@Name nvarchar(255)= N'Banner test',
+	@PositionCode nvarchar(255) = 'test-2'
+AS
+BEGIN
+	IF @Type NOT IN ('GET','ADD-POSITION-BANNER','UPDATE-BY-ID','DELETE')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+	DECLARE @Sql nvarchar(255) = ''
+
+
+
+
+	IF @Type = 'GET'
+	BEGIN
+		select *,dbo.GetErrorMessage(0) AS ErrorMessage  
+		from VaccineCategory.dbo.PositionBanner
+		WHERE IsDelete = 0 AND IsActive = 1
+		GOTO THOAT
+	END
+
+
+
+	IF @Type = 'ADD-POSITION-BANNER'
+	BEGIN
+		IF EXISTS (SELECT 1 FROM VaccineCategory.dbo.PositionBanner WHERE PositionCode = @PositionCode)
+		BEGIN
+			SELECT dbo.GetErrorMessage(2) ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			declare @getdatenow datetime = GETDATE()
+			INSERT INTO VaccineCategory.dbo.PositionBanner(Name, PositionCode ,CreatedAt) VALUES (@Name, @PositionCode, @getdatenow)
+			select dbo.GetErrorMessage(0) AS ErrorMessage
+			goto THOAT
+		END
+	END
+
+
+	IF @Type = 'UPDATE-BY-ID'
+	BEGIN
+    IF NOT EXISTS (SELECT 1 FROM VaccineCategory.dbo.PositionBanner WHERE ID = @ID)
+    BEGIN
+        SELECT dbo.GetErrorMessage(3) AS ErrorMessage
+        GOTO THOAT
+    END
+    ELSE
+    BEGIN
+        UPDATE VaccineCategory.dbo.PositionBanner
+        SET Name = @Name,
+			PositionCode = @PositionCode,
+            CreatedAt = GETDATE() 
+        WHERE ID = @ID;
+
+        SELECT dbo.GetErrorMessage(0) AS ErrorMessage
+        GOTO THOAT
+    END
+	END
+	
+	IF @Type = 'DELETE'
+	BEGIN
+		IF NOT EXISTS (SELECT 1 FROM VaccineCategory.dbo.PositionBanner WHERE ID = @ID)
+		BEGIN
+			SELECT dbo.GetErrorMessage(3) AS ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			UPDATE VaccineCategory.dbo.PositionBanner
+			SET IsDelete = 1
+			WHERE ID = @ID;
+
+			SELECT dbo.GetErrorMessage(0) AS ErrorMessage
+			GOTO THOAT
+		END
+	END
+
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecPost]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecPost]
+    @Type varchar(50) = 'RANDOM_POST_ALL',
+	@ShortContent NVARCHAR(MAX) = N'Bài viết mẫu',
+	@FullContentDesktop NVARCHAR(MAX) = N'Bài Viết mẫu',
+	@FullContentMobile NVARCHAR(MAX) = N'Bài Viết mẫu',
+    @LinkImages NVARCHAR(255) = 'link-link-imgaes',
+	@ID int = 1,
+	@LinkRoute NVARCHAR(255) = 'bai-viet',
+	@PostType NVARCHAR(255) = '',
+	@Title NVARCHAR(MAX) = '',
+	@SearchKeyword nvarchar(MAX) = N'Vắc xin' 
+AS
+BEGIN
+	IF @Type NOT IN ('GET','GET-ALL','ADD-POST','DELETE','UPDATE-BY-ID','GET-BY-LINKROUTE','GET-POST-BYID','GET-POST-NAMETYPE','RANDOM_POST','SEARCH','RANDOM_POST_ALL')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+
+
+	DECLARE @Sql NVARCHAR(MAX) = ''
+	IF @Type = 'GET'
+	BEGIN
+		SET @Sql = 'SELECT ID, Title, ShortContent, LinkImages, CreateDate, LinkRoute FROM Post
+					WHERE IsActive = 1 AND IsDeleted = 0
+		'
+		EXEC(@Sql)
+		GOTO THOAT
+	END
+
+
+	IF @Type = 'GET-ALL'
+	BEGIN
+		SET @Sql = 'SELECT ID, Title, * ,dbo.GetErrorMessage(0) AS ErrorMessage FROM Post
+					WHERE IsActive = 1 AND IsDeleted = 0
+		'
+		EXEC(@Sql)
+		GOTO THOAT
+	END
+
+
+	IF @Type = 'ADD-POST'
+	BEGIN
+		declare @GetDateNow datetime = GETDATE()
+		INSERT INTO Post (Title, ShortContent, FullContentDesktop,FullContentMobile, LinkImages, CreateDate, LinkRoute, PostType)
+		VALUES (@Title, @ShortContent, @FullContentDesktop,@FullContentMobile, @LinkImages, @GetDateNow, @LinkRoute, @PostType);
+		exec(@sql)
+		SELECT dbo.GetErrorMessage(0) AS ErrorMessage
+		GOTO THOAT
+	END
+
+
+	IF @Type = 'DELETE'
+	BEGIN
+		IF NOT EXISTS (SELECT 1 FROM VaccineCategory.dbo.Post WHERE ID = @ID)
+		BEGIN
+			SELECT @ID ID, dbo.GetErrorMessage(3) AS ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			UPDATE VaccineCategory.dbo.Post
+			SET IsDeleted = 1
+			WHERE ID = @ID;
+			SELECT dbo.GetErrorMessage(0) AS ErrorMessage
+			GOTO THOAT
+		END
+	END
+
+	IF @Type = 'UPDATE-BY-ID'
+	BEGIN
+		IF NOT EXISTS (SELECT 1 FROM VaccineCategory.dbo.Post WHERE ID = @ID)
+		BEGIN
+			SELECT dbo.GetErrorMessage(3) AS ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			UPDATE VaccineCategory.dbo.Post
+			SET Title = @Title,
+				ShortContent = @ShortContent,
+				FullContentDesktop = @FullContentDesktop,
+				FullContentMobile = @FullContentMobile,
+				LinkImages = @LinkImages,
+				LinkRoute = @LinkRoute,
+				PostType = @PostType
+			WHERE ID = @ID;
+			SELECT dbo.GetErrorMessage(0) AS ErrorMessage
+			GOTO THOAT
+		END
+	END
+
+	IF @Type = 'GET-BY-LINKROUTE'
+	BEGIN
+		if (select count(*) from VaccineCategory.dbo.Post where LinkRoute = @LinkRoute) <= 0
+		begin
+			SELECT 404 ErrorCode,dbo.GetErrorMessage(3) AS ErrorMessage
+			goto thoat
+		end
+		else
+		begin
+			select TOP(1) *,0 ErrorCode, dbo.GetErrorMessage(0) AS ErrorMessage
+			from VaccineCategory.dbo.Post
+			where IsDeleted = 0 AND IsActive = 1 AND LinkRoute = @LinkRoute
+			GOTO THOAT
+		end
+	END
+
+	IF @Type = 'GET-POST-BYID'
+	BEGIN
+		SELECT TOP (1) [ID],[Title],[ShortContent],[LinkImages],[LinkRoute],[PostType]
+		FROM [VaccineCategory].[dbo].[Post]
+		WHERE ID = @ID
+	END
+
+	IF @Type = 'GET-POST-NAMETYPE'
+	BEGIN
+		DECLARE @NameType NVARCHAR(255);
+		IF (SELECT COUNT(*) FROM PostType WHERE ID = @ID) > 0 
+		BEGIN
+			SELECT TOP (1) @NameType = NameType
+			FROM [VaccineCategory].[dbo].[PostType]
+			WHERE ID = @ID AND IsDeleted = 0 AND IsActive = 1;
+
+			-- Lấy các bài viết dựa trên NameType vừa lấy được
+			SELECT [ID], [Title], [ShortContent], [LinkImages], [LinkRoute], [PostType], dbo.GetErrorMessage(0) AS ErrorMessage
+			FROM [VaccineCategory].[dbo].[Post]
+			WHERE PostType = @NameType
+		END
+		ELSE
+		BEGIN
+			SELECT dbo.GetErrorMessage(3) AS ErrorMessage
+		END
+	END
+
+
+	IF @Type = 'RANDOM_POST'
+	BEGIN
+		SET @Sql = 'SELECT TOP (10) ID, Title, ShortContent, LinkImages, CreateDate, LinkRoute, PostType
+					FROM Post
+					WHERE IsActive = 1 AND IsDeleted = 0
+					ORDER BY NEWID()'
+		EXEC(@Sql)
+		GOTO THOAT
+	END
+
+	IF @Type = 'RANDOM_POST_ALL'
+	BEGIN
+		SET @Sql = 'SELECT ID, Title, ShortContent, LinkImages, CreateDate, LinkRoute, PostType
+					FROM Post
+					WHERE IsActive = 1 AND IsDeleted = 0
+					ORDER BY CreateDate DESC'
+		EXEC(@Sql)
+		GOTO THOAT
+	END
+
+	IF @Type = 'SEARCH'
+	BEGIN
+		SELECT Title, LinkRoute, LinkImages, ShortContent
+		FROM VaccineCategory.dbo.Post
+		WHERE (Title LIKE '%' + @SearchKeyword + '%' 
+			   OR ShortContent LIKE '%' + @SearchKeyword + '%')
+		AND IsActive = 1
+		AND IsDeleted = 0
+	END
+
+
+
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecPostType]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecPostType]
+    @Type varchar(50) = 'UPDATE-BY-ID',
+	@Name nvarchar(255)= N'Banner đầu',
+	@Description nvarchar(max)= N'VÃI',
+	@LinkImages nvarchar(max)='img',
+	@NameType nvarchar(255) = N'Danh mục vắc xin',
+	@ID int = 1
+AS
+BEGIN
+	IF @Type NOT IN ('GET','ADD-POSTYPE','UPDATE-BY-ID','DELETE')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+
+
+	DECLARE @Sql nvarchar(255) = ''
+	IF @Type = 'GET'
+	BEGIN
+		select *, dbo.GetErrorMessage(0) AS ErrorMessage 
+		from VaccineCategory.dbo.PostType
+		where IsDeleted = 0 AND IsActive = 1
+		GOTO THOAT
+	END
+
+	IF @Type = 'ADD-POSTYPE'
+	BEGIN
+		IF EXISTS (SELECT 1 FROM VaccineCategory.dbo.PostType WHERE NameType = @NameType)
+		BEGIN
+			SELECT @NameType NameType, dbo.GetErrorMessage(2) AS ErrorMessage
+			GOTO THOAT
+		END
+
+		INSERT INTO VaccineCategory.dbo.PostType(NameType) 
+		VALUES (@NameType)
+		select dbo.GetErrorMessage(0) AS ErrorMessage
+
+	END
+	
+	IF @Type = 'DELETE'
+	BEGIN
+		IF NOT EXISTS (SELECT 1 FROM VaccineCategory.dbo.PostType WHERE ID = @ID)
+		BEGIN
+			SELECT @ID ID, dbo.GetErrorMessage(3) AS ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			UPDATE VaccineCategory.dbo.PostType
+			SET IsDeleted = 1
+			WHERE ID = @ID;
+			SELECT @ID ID, dbo.GetErrorMessage(0) AS ErrorMessage
+			GOTO THOAT
+		END
+	END
+
+	IF @Type = 'UPDATE-BY-ID'
+	BEGIN
+		IF NOT EXISTS (SELECT 1 FROM VaccineCategory.dbo.PostType WHERE ID = @ID)
+		BEGIN
+			SELECT dbo.GetErrorMessage(3) AS ErrorMessage
+			GOTO THOAT
+		END
+		ELSE
+		BEGIN
+			UPDATE VaccineCategory.dbo.PostType
+			SET NameType =  @NameType
+			WHERE ID = @ID;
+			SELECT @NameType NameType,dbo.GetErrorMessage(0) AS ErrorMessage
+			GOTO THOAT
+		END
+	END
+
+
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecSingleItem]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecSingleItem]
+    @Type varchar(50) = 'GET-BY-LINKROUTE',
+	@ID int = 1,
+	@NameYearOld nvarchar(255) = N'Việt Nam',
+	@IsActive bit = 1,
+	@Name nvarchar(255)  = '',
+	@Price int = 0,
+	@CountryItem nvarchar(255) = N'',
+	@ShortContent nvarchar(255) = '',
+	@FullContent nvarchar(max) = '',
+	@LinkRoute nvarchar(255) = '/zona-than-kinh',
+	@LinkImages nvarchar(255) = '',
+	@IsDeleted bit = 0,
+	@AgeType nvarchar(500) = N''
+AS
+BEGIN
+	IF @Type NOT IN ('GET-SINGLE-ALL','INSERT-SINGLE','EDIT-SINGLE','DELETE-SINGLE-ITEM','ACTIVE-SINGLE-ITEM','GET-SINGLE-PUBLIC','GET-BY-LINKROUTE')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+	DECLARE @Sql nvarchar(255) = ''
+
+	IF @Type = 'GET-SINGLE-ALL'
+	BEGIN
+		SELECT 
+			*, 
+			0 AS ErrorCode, 
+			dbo.GetErrorMessage(0) AS ErrorMessage,
+			FORMAT(Price, 'N0', 'en-US') AS PriceFormat
+		FROM VaccineCategory.dbo.SingleItem
+		WHERE IsDeleted = 0
+		GOTO thoat
+	END
+
+	IF @Type = 'GET-SINGLE-PUBLIC'
+	BEGIN
+		SELECT 
+			ID, Name, Price, ShortContent, LinkRoute,LinkImages,AgeType,
+			0 AS ErrorCode, 
+			dbo.GetErrorMessage(0) AS ErrorMessage,
+			FORMAT(Price, 'N0', 'en-US') AS PriceFormat
+		FROM VaccineCategory.dbo.SingleItem
+		WHERE IsDeleted = 0 AND IsActive = 1
+		GOTO thoat
+	END
+	IF @Type = 'INSERT-SINGLE'
+	BEGIN
+		BEGIN TRY
+			IF (SELECT COUNT(*) FROM VaccineCategory.dbo.SingleItem WHERE LinkRoute = @LinkRoute) >= 1
+			BEGIN
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(10) ErrorMessage
+			END
+			ELSE
+			BEGIN
+				INSERT INTO VaccineCategory.dbo.SingleItem(Name,Price,CountryItem,ShortContent,FullContent,LinkImages,LinkRoute,AgeType)
+				VALUES (@Name,@Price,@CountryItem,@ShortContent,@FullContent,@LinkImages,@LinkRoute,@AgeType)
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'EDIT-SINGLE'
+	BEGIN
+		BEGIN TRY
+				UPDATE VaccineCategory.dbo.SingleItem
+				SET	Name = @Name,
+					Price = @Price,
+					CountryItem = @CountryItem,
+					ShortContent = @ShortContent,
+					FullContent = @FullContent,
+					LinkImages = @LinkImages,
+					LinkRoute = @LinkRoute,
+					AgeType = @AgeType
+				WHERE ID = @ID
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+ 		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'DELETE-SINGLE-ITEM'
+	BEGIN
+		BEGIN TRY
+			UPDATE VaccineCategory.dbo.SingleItem
+			SET IsDeleted = 1
+			WHERE ID = @ID 
+			SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'ACTIVE-SINGLE-ITEM'
+	BEGIN
+		BEGIN TRY
+			IF @IsActive = 0 
+			BEGIN 
+				UPDATE VaccineCategory.dbo.SingleItem
+				SET IsActive = 0
+				WHERE ID = @ID 
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+				GOTO THOAT
+			END
+			IF @IsActive = 1
+			BEGIN 
+				UPDATE VaccineCategory.dbo.SingleItem
+				SET IsActive = 1
+				WHERE ID = @ID 
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+				GOTO THOAT
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'GET-BY-LINKROUTE'
+	BEGIN
+		BEGIN TRY
+			SELECT TOP 1  * FROM VaccineCategory.dbo.SingleItem WHERE LinkRoute = @LinkRoute
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[ExecVaccineCenter]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROC [dbo].[ExecVaccineCenter]
+    @Type varchar(50) = 'GET-BYID',
+	@ID int = 1,
+	@NameYearOld nvarchar(255) = N'Việt Nam',
+	@IsActive bit = 1,
+	@Name nvarchar(255)  = '',
+	@Price int = 0,
+	@City nvarchar(255) = '',
+	@Ward nvarchar(255) = '',
+	@District nvarchar(max) = '',
+	@Address nvarchar(255) = '',
+	@LinkImages nvarchar(255) = '',
+	@IsDeleted bit = 0,
+	@LinkGoogle nvarchar(1000) = ''
+	
+AS
+BEGIN
+	IF @Type NOT IN ('GET-ALL','INSERT-CENTER','EDIT-CENTER','DELETE-CENTER-ITEM','ACTIVE-CENTER-ITEM','GET-PUBLIC','GET-BYID')
+	BEGIN
+		select dbo.GetErrorMessage(1) AS ErrorMessage
+		goto THOAT
+	END
+	DECLARE @Sql nvarchar(255) = ''
+
+	IF @Type = 'GET-ALL'
+	BEGIN
+		SELECT 
+			*,0 ErrorCode,dbo.GetErrorMessage(0) ErrorMessage
+		FROM VaccineCategory.dbo.VaccineCenter
+		WHERE IsDeleted = 0
+		GOTO thoat
+	END
+
+	IF @Type = 'GET-PUBLIC'
+	BEGIN
+		SELECT 
+			ID,Name,Address,Ward,City,District,CreateDate,LinkGoogle,0 ErrorCode,dbo.GetErrorMessage(0) ErrorMessage
+		FROM VaccineCategory.dbo.VaccineCenter
+		WHERE IsDeleted = 0 AND IsActive = 1
+		GOTO thoat
+	END
+
+	IF @Type = 'INSERT-CENTER'
+	BEGIN
+		BEGIN TRY
+			IF (SELECT COUNT(*) FROM VaccineCategory.dbo.VaccineCenter WHERE Address = @Address) >= 1
+			BEGIN
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(10) ErrorMessage
+			END
+			ELSE
+			BEGIN
+				INSERT INTO VaccineCategory.dbo.VaccineCenter(Name,Address,Ward,District,City,LinkGoogle)
+				VALUES (@Name,@Address,@Ward,@District,@City,@LinkGoogle)
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'EDIT-CENTER'
+	BEGIN
+		BEGIN TRY
+				UPDATE VaccineCategory.dbo.VaccineCenter
+				SET	Name = @Name,
+					Address = @Address,
+					Ward = @Ward,
+					District = @District,
+					City = @City,
+					LinkGoogle  = @LinkGoogle
+				WHERE ID = @ID
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+ 		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'DELETE-CENTER-ITEM'
+	BEGIN
+		BEGIN TRY
+			UPDATE VaccineCategory.dbo.VaccineCenter
+			SET IsDeleted = 1
+			WHERE ID = @ID 
+			SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'ACTIVE-CENTER-ITEM'
+	BEGIN
+		BEGIN TRY
+			IF @IsActive = 0 
+			BEGIN 
+				UPDATE VaccineCategory.dbo.VaccineCenter
+				SET IsActive = 0
+				WHERE ID = @ID 
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+				GOTO THOAT
+			END
+			IF @IsActive = 1
+			BEGIN 
+				UPDATE VaccineCategory.dbo.VaccineCenter
+				SET IsActive = 1
+				WHERE ID = @ID 
+				SELECT 0 ErrorCode, dbo.GetErrorMessage(0) ErrorMessage
+				GOTO THOAT
+			END
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+
+	IF @Type = 'GET-BYID'
+	BEGIN
+		BEGIN TRY
+			SELECT TOP(1) * FROM VaccineCategory.dbo.VaccineCenter WHERE ID = @ID
+		END TRY
+		BEGIN CATCH
+			SELECT 400 ErrorCode, dbo.GetErrorMessage(9) ErrorMessage
+		END CATCH
+	END
+END
+THOAT:
+GO
+/****** Object:  StoredProcedure [dbo].[InsertMessage]    Script Date: 5/12/2026 5:03:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[InsertMessage]
+	@Type Nvarchar(255) = 'GET-ADMIN-ALL',
+    @Sender NVARCHAR(100) = '0338988152',
+    @Receiver NVARCHAR(100) = 'admin@manhduc',
+    @MessageContent NVARCHAR(500) = NULL
+AS
+BEGIN
+	IF @Type = 'INSERT-MESSAGE'
+	BEGIN
+		INSERT INTO Messages (Sender, Receiver, MessageContent, Timestamp)
+        VALUES (@Sender, @Receiver, @MessageContent, GETDATE());
+		SELECT 0 ErrorCode
+	END
+
+	IF @Type = 'GET'
+    BEGIN
+        SELECT 
+            Sender, 
+            Receiver, 
+            MessageContent, 
+            Timestamp
+        FROM 
+            Messages
+        WHERE 
+            (Sender = @Sender AND Receiver = @Receiver)
+            OR (Sender = @Receiver AND Receiver = @Sender)
+        ORDER BY 
+            Timestamp ASC; 
+    END
+
+	IF @Type = 'GET-ADMIN-ALL'
+	BEGIN
+		 ;WITH RankedMessages AS (
+        SELECT 
+            Sender,
+            Receiver,
+            MessageContent,
+            Timestamp,
+            ROW_NUMBER() OVER (PARTITION BY Sender ORDER BY Timestamp DESC) AS RowNum
+        FROM Messages
+        WHERE Receiver = @Receiver
+		)
+		SELECT Sender, Receiver, MessageContent, Timestamp
+		FROM RankedMessages
+		WHERE RowNum = 1
+		ORDER BY Timestamp DESC;
+	END
+
+
+
+END
+GO
+USE [master]
+GO
+ALTER DATABASE [VaccineCategory] SET  READ_WRITE 
+GO
